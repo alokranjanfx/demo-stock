@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const stocksRoute = require('./routes/stocks');
 const cors = require('cors');
-
+const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
@@ -15,6 +15,8 @@ app.listen(PORT, () => {
 });
 
 const axios = require('axios');
+
+app.use(express.static(path.join(__dirname, 'build')));
 
 
 const fetchAndStoreStockPrices = async () => {
