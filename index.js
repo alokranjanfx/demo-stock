@@ -9,35 +9,15 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 
 app.use('/api/stocks', stocksRoute);
+mongoose.connect('mongodb+srv://dashboard:k8O0BeFR4xNCK4Z8@cluster0.pi2rh3b.mongodb.net/?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error(err));
 
+app.use(express.static(path.join(__dirname, 'build')));
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-const axios = require('axios');
-
-app.use(express.static(path.join(__dirname, 'build')));
-
-
-const fetchAndStoreStockPrices = async () => {
-  try {
-    const response = await axios.get('http://localhost:3001/api/stocks');
-    const data = response.data;
-
-    console.log('Received data:', data); // Log received data for debugging
-
-    for (const stockName in data) {
-      await Stocks.findOneAndUpdate(
-        { name: stockName },
-        { price: data[stockName] },
-        { upsert: true }
-      );
-    }
-    console.log('Stock prices updated successfully.');
-  } catch (error) {
-    console.error('Error fetching and storing stock prices:', error.response ? error.response.data : error.message);
-  }
-};
-
-
-setInterval(fetchAndStoreStockPrices, 60000);
